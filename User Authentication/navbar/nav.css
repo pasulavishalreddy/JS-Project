@@ -1,0 +1,10 @@
+.nav{
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 50px;
+    background-color: lightgrey;
+}
+#nav-btns{
+    display: flex;
+    align-items: center;
+}
