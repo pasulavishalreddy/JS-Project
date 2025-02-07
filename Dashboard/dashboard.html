@@ -17,13 +17,20 @@
             </div>
             <div class="mb-3 row g-2">
                 <div class="col">
-                    <input type="number" id="hours" class="form-control" placeholder="Hours" min="0" required>
+                    <label for="taskDate" class="form-label">Date</label>
+                    <input type="date" id="taskDate" class="form-control" required>
+                  </div>
+                <div class="col">
+                    <label for="taskDate" class="form-label">Hours</label>
+                    <input type="number" id="hours" class="form-control" placeholder="0-24" min="0" required>
                 </div>
                 <div class="col">
-                    <input type="number" id="minutes" class="form-control" placeholder="Minutes" min="0" max="59" required>
+                    <label for="taskDate" class="form-label">Minutes</label>
+                    <input type="number" id="minutes" class="form-control" placeholder="0-60" min="0" max="59" required>
                 </div>
                 <div class="col">
-                    <input type="number" id="seconds" class="form-control" placeholder="Seconds" min="0" max="59" required>
+                    <label for="taskDate" class="form-label">Seconds</label>
+                    <input type="number" id="seconds" class="form-control" placeholder="0-60" min="0" max="59" required>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary w-100">Add Task</button>

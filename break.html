@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Countdown Timer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .task-timer {
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            border: 2px solid #6c757d;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .task {
+            margin-bottom: 1rem;
+        }
+        .time {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .break-buttons {
+            display: none;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="task-timer">
+    <h1 class="mb-4 text-center">Task Countdown Timer</h1>
+    <form id="taskForm" class="mb-3">
+        <div class="mb-3">
+            <input type="text" id="taskName" class="form-control" placeholder="Enter Task Name" required>
+        </div>
+        <div class="mb-3 row g-2">
+            <div class="col">
+                <input type="number" id="hours" class="form-control" placeholder="Hours" min="0" required>
+            </div>
+            <div class="col">
+                <input type="number" id="minutes" class="form-control" placeholder="Minutes" min="0" max="59" required>
+            </div>
+            <div class="col">
+                <input type="number" id="seconds" class="form-control" placeholder="Seconds" min="0" max="59" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Add Task</button>
+    </form>
+    <ul id="taskList" class="list-group">
+        <!-- Task items will be added dynamically here -->
+    </ul>
+</div>
+
+<script>
+    const taskForm = document.getElementById('taskForm');
+    const taskList = document.getElementById('taskList');
+
+    function formatTime(hours, minutes, seconds) {
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function updateTaskTimer(taskItem, endTime) {
+        const timerElement = taskItem.querySelector('.time');
+        const now = new Date();
+        const timeLeft = endTime - now;
+
+        if (timeLeft <= 0) {
+            timerElement.textContent = '00:00:00';
+            clearInterval(taskItem.timerInterval);
+            taskItem.classList.add('list-group-item-danger');
+            alert(`Task "${taskItem.dataset.taskName}" is complete!`);
+            return;
+        }
+
+        const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+        const seconds = Math.floor((timeLeft / 1000) % 60);
+        timerElement.textContent = formatTime(hours, minutes, seconds);
+
+        // Show break button every 5 seconds
+        if (seconds % 5 === 0) {
+            taskItem.querySelector('.break-buttons').style.display = 'flex';
+        } else {
+            taskItem.querySelector('.break-buttons').style.display = 'none';
+        }
+    }
+
+    function addTask(taskName, hours, minutes, seconds) {
+        const taskItem = document.createElement('li');
+        taskItem.className = 'list-group-item d-flex justify-content-between align-items-center task';
+        taskItem.dataset.taskName = taskName;
+
+        let endTime = new Date();
+        endTime.setHours(endTime.getHours() + parseInt(hours));
+        endTime.setMinutes(endTime.getMinutes() + parseInt(minutes));
+        endTime.setSeconds(endTime.getSeconds() + parseInt(seconds));
+
+        taskItem.innerHTML = `
+            <div>
+                <strong>${taskName}</strong>
+                <div class="time">${formatTime(hours, minutes, seconds)}</div>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-success me-2 edit-task">Edit</button>
+                <button class="btn btn-sm btn-warning me-2 reset-task">Reset</button>
+                <button class="btn btn-sm btn-danger delete-task">Delete</button>
+            </div>
+            <div class="break-buttons">
+                <button class="btn btn-sm btn-info break-5">5 Min Break</button>
+                <button class="btn btn-sm btn-info break-15">15 Min Break</button>
+                <button class="btn btn-sm btn-danger stop-break">Stop Break</button>
+            </div>
+        `;
+
+        taskList.appendChild(taskItem);
+        taskItem.timerInterval = setInterval(() => updateTaskTimer(taskItem, endTime), 1000);
+
+        // Delete Task
+        taskItem.querySelector('.delete-task').addEventListener('click', () => {
+            clearInterval(taskItem.timerInterval);
+            taskList.removeChild(taskItem);
+        });
+
+        // Reset Task
+        taskItem.querySelector('.reset-task').addEventListener('click', () => {
+            clearInterval(taskItem.timerInterval);
+            endTime = new Date();
+            endTime.setHours(endTime.getHours() + parseInt(hours));
+            endTime.setMinutes(endTime.getMinutes() + parseInt(minutes));
+            endTime.setSeconds(endTime.getSeconds() + parseInt(seconds));
+            taskItem.dataset.endTime = endTime.getTime();
+            taskItem.timerInterval = setInterval(() => updateTaskTimer(taskItem, endTime), 1000);
+        });
+
+        // Handle Break
+        function takeBreak(duration) {
+            clearInterval(taskItem.timerInterval);
+            let breakTime = duration * 60; // Convert minutes to seconds
+            const breakInterval = setInterval(() => {
+                const breakMinutes = Math.floor(breakTime / 60);
+                const breakSeconds = breakTime % 60;
+                taskItem.querySelector('.time').textContent = `Break: ${formatTime(0, breakMinutes, breakSeconds)}`;
+                if (breakTime === 0) {
+                    clearInterval(breakInterval);
+                    taskItem.timerInterval = setInterval(() => updateTaskTimer(taskItem, endTime), 1000);
+                }
+                breakTime--;
+            }, 1000);
+        }
+
+        taskItem.querySelector('.break-5').addEventListener('click', () => takeBreak(5));
+        taskItem.querySelector('.break-15').addEventListener('click', () => takeBreak(15));
+        taskItem.querySelector('.stop-break').addEventListener('click', () => {
+        clearInterval(breakInterval);
+        taskItem.timerInterval = setInterval(() => updateTaskTimer(taskItem, endTime), 1000); // Resume task timer
+        taskItem.querySelector('.stop-break').style.display = 'none'; // Hide stop button
+    });
+    }
+
+    taskForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const taskName = document.getElementById('taskName').value;
+        const hours = document.getElementById('hours').value;
+        const minutes = document.getElementById('minutes').value;
+        const seconds = document.getElementById('seconds').value;
+        addTask(taskName, hours, minutes, seconds);
+        taskForm.reset();
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

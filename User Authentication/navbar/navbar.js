@@ -22,14 +22,41 @@ const app = initializeApp(firebaseConfig);
     // console.log(signupmodal);
   let signupmodal=new bootstrap.Modal(document.getElementById("signupModal"));
   signupmodal.show()
+
+  let signupbtn=document.getElementById("signup-btn");
+  signupbtn.addEventListener("click",()=>{
+
+  let Signupname=document.getElementById("signup-name").value.trim();
+  let Signupemail=document.getElementById("signup-email").value.trim();
+  let Signuppassword=document.getElementById("signup-password").value.trim();
+  let Signupcpassword=document.getElementById("confirm-password").value.trim();
+
+    if(Signupname==""||Signupemail==""||Signupemail==""||Signuppassword==""||Signupcpassword==""){
+      
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Enter All Fields!",
+      }).then(()=>{
+        signupmodal.show()
+      })
+    }
+
+    Swal.fire({
+      title: "Sucessfully Signed!",
+      icon: "success",
+      draggable: true
+    });
+
+  })
       
   })
 
-  let login=document.getElementById("Loginbtn");
-    login.addEventListener("click",(e)=>{
-      e.preventDefault()
-    let loginmodal=new bootstrap.Modal(document.getElementById("loginModal"))
-    loginmodal.show()
-  })
+  // let login=document.getElementById("Loginbtn");
+  //   login.addEventListener("click",(e)=>{
+  //     e.preventDefault()
+  //   let loginmodal=new bootstrap.Modal(document.getElementById("loginModal"))
+  //   loginmodal.show()
+  // })
 
  

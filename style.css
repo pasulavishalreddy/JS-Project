@@ -1,0 +1,31 @@
+body {
+    font-family: Arial, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.bg-dark {
+    background-color: #121212 !important;
+    color: white !important;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+}
+
+button {
+    margin: 5px;
+}
+
+#timerDisplay {
+    font-size: 3rem;
+    margin: 20px 0;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
